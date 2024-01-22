@@ -58,16 +58,10 @@ type market struct {
 	Products map[string]productData
 }
 
-//TODO: considerar quantidades
 func getProducts() {
-	market1 := parseMarketInfos("Market1.json", MARKET_1_ID)
-	market2 := parseMarketInfos("Market2.json", MARKET_2_ID)
-	market3 := parseMarketInfos("Market3.json", MARKET_3_ID)
-	availableMarkets := []market{market1, market2, market3}
-
-	userList := parseUserListInfos("userGroceriesList.json")
-
 	var checkout checkoutList
+	availableMarkets := buildMarketList()
+	userList := parseUserListInfos("userGroceriesList.json")
 	marketFees := make([]bool, len(availableMarkets) + 1)
 
 	for _, item := range userList.Product {
@@ -75,23 +69,18 @@ func getProducts() {
 		checkout.Items = append(checkout.Items, itemInfos)
 		checkout.Price += price
 	}
-	fmt.Println(checkout)
-	fmt.Println(checkout.Price, checkPrice(checkout, availableMarkets, marketFees))
+
+	printResults(checkout, availableMarkets, marketFees)
 }
 
-func checkPrice(checkout checkoutList, markets []market, fees []bool) int {
-	sum := 0
-	for _, item := range checkout.Items {
-		sum += markets[item.MarketID - 1].Products[item.Name].Price
-	}
-	for i := range fees {
-		if fees[i] {
-			sum += markets[i - 1].Fee
-		}
-	}
-	return sum
+func buildMarketList() []market {
+	market1 := parseMarketInfos("Market1.json", MARKET_1_ID)
+	market2 := parseMarketInfos("Market2.json", MARKET_2_ID)
+	market3 := parseMarketInfos("Market3.json", MARKET_3_ID)
+	return []market{market1, market2, market3}
 }
 
+//TODO: considerar quantidades
 func findBestDeal(item userProducts, markets []market, fees []bool) (itemData, int) {
 	bestDeal := math.MaxInt
 	itemInfos := itemData {
@@ -112,6 +101,24 @@ func findBestDeal(item userProducts, markets []market, fees []bool) (itemData, i
 	return itemInfos, bestDeal
 }
 
+func parseMarketInfos(fileName string, marketID int) market {
+	var marketData marketList
+	marketFile, err := os.Open(fileName)
+	defer marketFile.Close()
+	check(err)
+
+	jsonParser := json.NewDecoder(marketFile)
+	err = jsonParser.Decode(&marketData)
+	check(err)
+
+	products := makeMap(marketData.Products)
+	return market{
+		ID: marketID,
+		Fee: marketData.Fee,
+		Products: products,
+	}
+}
+
 func makeMap(list []product) map[string]productData {
 	productsMap := make(map[string]productData)
 	for _, item := range list{
@@ -120,33 +127,42 @@ func makeMap(list []product) map[string]productData {
 	return productsMap
 }
 
-func parseMarketInfos(fileName string, marketID int) market {
-	var marketData marketList
-	marketFile, err := os.Open(fileName)
-	defer marketFile.Close()
-	check(err)
-	jsonParser := json.NewDecoder(marketFile)
-	err = jsonParser.Decode(&marketData)
-	check(err)
-
-	products := makeMap(marketData.Products)
-
-	return market{
-		ID: marketID,
-		Fee: marketData.Fee,
-		Products: products,
-	}
-}
-
 func parseUserListInfos(fileName string) userList {
 	var user userList
 	userFile, err := os.Open(fileName)
 	defer userFile.Close()
 	check(err)
+
 	jsonParser := json.NewDecoder(userFile)
 	err = jsonParser.Decode(&user)
 	check(err)
+
 	return user
+}
+
+func printResults(checkout checkoutList, markets []market, fees []bool) {
+	fmt.Println(checkout)
+	fmt.Println(checkout.Price, checkPrice(checkout, markets, fees))
+}
+
+func checkPrice(checkout checkoutList, markets []market, fees []bool) int {
+	sum := 0
+	for _, item := range checkout.Items {
+		sum += markets[item.MarketID - 1].Products[item.Name].Price
+	}
+	sum += addFees(markets, fees)
+	
+	return sum
+}
+
+func addFees(markets []market, fees []bool) int {
+	sum := 0
+	for i := range fees {
+		if fees[i] {
+			sum += markets[i - 1].Fee
+		}
+	}
+	return sum
 }
 
 func check(err error) {
