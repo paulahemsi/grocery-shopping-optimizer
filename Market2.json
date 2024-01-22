@@ -1,0 +1,144 @@
+{
+  "fee": 3,
+  "products": [
+    {
+      "name": "rice",
+      "data": {
+          "quantity": 1,
+          "price": 15
+      }
+    },
+    {
+      "name": "beans",
+      "data": { "quantity": 1,
+      "price": 6
+    }
+
+    },
+    {
+      "name": "oil",
+      "data": { "quantity": 3,
+      "price": 9
+      }
+
+    },
+    {
+      "name": "pasta",
+      "data": { "quantity": 5,
+      "price": 70
+      }
+
+    },
+    {
+      "name": "sugar",
+      "data": { "quantity": 2,
+      "price": 4
+      }
+
+    },
+    {
+      "name": "salt",
+      "data": { "quantity": 10,
+      "price": 2
+      }
+
+    },
+    {
+      "name": "coffee",
+      "data": { "quantity": 1,
+      "price": 8
+      }
+
+    },
+    {
+      "name": "milk",
+      "data": { "quantity": 1,
+      "price": 5
+      }
+
+    },
+    {
+      "name": "cheese",
+      "data": { "quantity": 1,
+      "price": 10
+      }
+
+    },
+    {
+      "name": "bread",
+      "data": { "quantity": 1,
+      "price": 2
+      }
+
+    },
+    {
+      "name": "butter",
+      "data": { "quantity": 3,
+      "price": 8
+      }
+
+    },
+    {
+      "name": "cake",
+      "data": { "quantity": 6,
+      "price": 12
+      }
+
+    },
+    {
+      "name": "chocolate",
+      "data": { "quantity": 3,
+      "price": 5
+      }
+
+    },
+    {
+      "name": "juice",
+      "data": { "quantity": 1,
+      "price": 5
+      }
+
+    },
+    {
+      "name": "soda",
+      "data": { "quantity": 1,
+      "price": 5
+      }
+
+    },
+    {
+      "name": "beer",
+      "data": { "quantity": 1,
+      "price": 5
+      }
+
+    },
+    {
+      "name": "wine",
+      "data": { "quantity": 1,
+      "price": 10
+      }
+
+    },
+    {
+      "name": "water",
+      "data": { "quantity": 1,
+      "price": 2
+      }
+
+    },
+    {
+      "name": "chicken",
+      "data": { "quantity": 3,
+      "price": 12
+      }
+
+    },
+    {
+      "name": "beef",
+      "data": { "quantity": 2,
+      "price": 13
+      }
+
+    }
+  ]}
