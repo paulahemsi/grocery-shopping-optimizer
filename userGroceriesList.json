@@ -1,0 +1,84 @@
+{
+  "products": [
+      {
+        "name": "rice",
+        "quantity": 4
+      },
+      {
+        "name": "beans",
+        "quantity": 2
+      },
+      {
+        "name": "oil",
+        "quantity": 5
+      },
+      {
+        "name": "pasta",
+        "quantity": 4
+      },
+      {
+        "name": "sugar",
+        "quantity": 7
+      },
+      {
+        "name": "salt",
+        "quantity": 1
+      },
+      {
+        "name": "coffee",
+        "quantity": 4
+      },
+      {
+        "name": "milk",
+        "quantity": 5
+      },
+      {
+        "name": "cheese",
+        "quantity": 1
+      },
+      {
+        "name": "bread",
+        "quantity": 1
+      },
+      {
+        "name": "butter",
+        "quantity": 5
+      },
+      {
+        "name": "cake",
+        "quantity": 3
+      },
+      {
+        "name": "chocolate",
+        "quantity": 7
+      },
+      {
+        "name": "juice",
+        "quantity": 9
+      },
+      {
+        "name": "soda",
+        "quantity": 3
+      },
+      {
+        "name": "beer",
+        "quantity": 5
+      },
+      {
+        "name": "wine",
+        "quantity": 5
+      },
+      {
+        "name": "water",
+        "quantity": 10
+      },
+      {
+        "name": "chicken",
+        "quantity": 7
+      },
+      {
+        "name": "beef",
+        "quantity": 9
+      }
+  ]
+}
