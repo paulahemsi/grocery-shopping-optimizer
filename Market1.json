@@ -1,0 +1,144 @@
+{
+  "fee": 1,
+  "products": [
+    {
+        "name": "rice",
+      "data": {
+        "quantity": 1,
+        "price": 10
+      }
+    },
+    {
+        "name": "beans",
+      "data": {
+        "quantity": 1,
+        "price": 5
+      }
+    },
+    {
+        "name": "oil",
+      "data": {
+        "quantity": 1,
+        "price": 7
+      }
+    },
+    {
+        "name": "pasta",
+      "data": {
+        "quantity": 1,
+        "price": 300
+      }
+    },
+    {
+        "name": "sugar",
+      "data": {
+        "quantity": 1,
+        "price": 5
+      }
+    },
+    {
+        "name": "salt",
+      "data": {
+        "quantity": 1,
+        "price": 2
+      }
+    },
+    {
+        "name": "coffee",
+      "data": {
+        "quantity": 1,
+        "price": 8
+      }
+    },
+    {
+        "name": "milk",
+      "data": {
+        "quantity": 1,
+        "price": 5
+      }
+    },
+    {
+        "name": "cheese",
+      "data": {
+        "quantity": 1,
+        "price": 10
+      }
+    },
+    {
+        "name": "bread",
+      "data": {
+        "quantity": 1,
+        "price": 5
+      }
+    },
+    {
+        "name": "butter",
+      "data": {
+        "quantity": 1,
+        "price": 5
+      }
+    },
+    {
+        "name": "cake",
+      "data": {
+        "quantity": 1,
+        "price": 10
+      }
+    },
+    {
+        "name": "chocolate",
+      "data": {
+        "quantity": 1,
+        "price": 8
+      }
+    },
+    {
+        "name": "juice",
+      "data": {
+        "quantity": 1,
+        "price": 5
+      }
+    },
+    {
+        "name": "soda",
+      "data": {
+        "quantity": 1,
+        "price": 5
+      }
+    },
+    {
+        "name": "beer",
+      "data": {
+        "quantity": 1,
+        "price": 5
+      }
+    },
+    {
+        "name": "wine",
+      "data": {
+        "quantity": 1,
+        "price": 10
+      }
+    },
+    {
+        "name": "water",
+      "data": {
+        "quantity": 1,
+        "price": 2
+      }
+    },
+    {
+        "name": "chicken",
+      "data": {
+        "quantity": 1,
+        "price": 10
+      }
+    },
+    {
+      "name": "beef",
+      "data": {
+        "quantity": 1,
+        "price": 10
+      }
+    }
+]}
