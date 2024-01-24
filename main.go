@@ -7,22 +7,12 @@ import (
 	"math"
 )
 
-const (
-	MARKET_1_ID = 1
-	MARKET_2_ID = 2
-	MARKET_3_ID = 3
-)
-
-func main() {
-	getProducts()
-}
-
 type userList struct {
 	Product []userProducts `json:"products"`
 }
 
 type userProducts struct {
-	Name	 string `json:"name"`
+	Name	 productName `json:"name"`
 	Quantity int    `json:"quantity"`
 }
 
@@ -37,69 +27,133 @@ type marketList struct {
 }
 
 type product struct {
-	Name    string `json:"name"`
+	Name    productName `json:"name"`
 	Data    productData `json:"data"`
 }
 
-type checkoutList struct {
-	Price int
-	Items []itemData
-}
-
 type itemData struct {
-	Name string
 	MarketID int
-	Quantity int
+	Price int
 }
 
 type market struct {
 	ID int
 	Fee int
-	Products map[string]productData
+	Products map[productName]productData
+}
+
+type marketID int
+type productName string
+
+func main() {
+	getProducts()
 }
 
 func getProducts() {
-	var checkout checkoutList
+	checkoutItems := make(map[productName]itemData)
 	availableMarkets := buildMarketList()
 	userList := parseUserListInfos("userGroceriesList.json")
-	marketFees := make([]bool, len(availableMarkets) + 1)
-
-	for _, item := range userList.Product {
-		itemInfos, price := findBestDeal(item, availableMarkets, marketFees)
-		checkout.Items = append(checkout.Items, itemInfos)
-		checkout.Price += price
+	marketChargedFees := make([]bool, len(availableMarkets))
+	marketBestPrices := make([]map[productName]int, 3)
+	for i := range marketBestPrices {
+		marketBestPrices[i] = make(map[productName]int)
 	}
 
-	printResults(checkout, availableMarkets, marketFees)
+	for _, item := range userList.Product {
+		itemInfos := findBestDeal(item.Name, availableMarkets, marketChargedFees, marketBestPrices, checkoutItems)
+		checkoutItems[item.Name] = itemInfos
+	}
+
+	totalPrice := 0
+	for _, item := range checkoutItems {
+		totalPrice += item.Price
+	}
+	totalPrice += addFees(availableMarkets, marketChargedFees)
+	
+	printResults(checkoutItems, totalPrice, availableMarkets, marketChargedFees)
+}
+
+type BestPrice struct {
+	MarketID marketID
+	Price int
+}
+
+func findBestDeal(itemName productName, markets []market, fees []bool, marketBestPrices []map[productName]int, checkoutItems map[productName]itemData) itemData {
+	var winningProductPrice int
+	bestDeal := math.MaxInt
+	itemInfos := itemData {}
+	bestPrice := BestPrice{
+		MarketID: -1,
+		Price: math.MaxInt,
+	}
+
+	for marketId := range markets {
+		fee := markets[marketId].Fee
+		productPrice := markets[marketId].Products[itemName].Price
+		deal := productPrice + fee
+
+		updateBestPrice(productPrice, &bestPrice, marketId)
+		updateBestDeal(deal, &bestDeal, &itemInfos, markets, &winningProductPrice, marketId, itemName)
+	}
+
+	if bestPrice.Price < winningProductPrice {
+		marketBestPrices[bestPrice.MarketID][itemName] = bestPrice.Price
+	}
+
+	if isMarketFirstBuy(fees, itemInfos.MarketID) {
+		fees[itemInfos.MarketID] = true
+		checkPreviousProducts(checkoutItems, marketBestPrices, itemInfos.MarketID)
+	}
+
+	return itemInfos
+}
+
+func checkPreviousProducts(checkoutItems map[productName]itemData, marketBestPrices []map[productName]int, marketId int) {
+	for name, price := range marketBestPrices[marketId] {
+		checkoutItems[name] = itemData{
+			MarketID: marketId,
+			Price:    price,
+		}
+	}
+}
+
+func updateBestPrice(productPrice int, bestPrice *BestPrice, marketId int) {
+	if productPrice < bestPrice.Price {
+		bestPrice.Price = productPrice
+		bestPrice.MarketID = marketID(marketId)
+	}
+}
+
+func updateBestDeal(deal int, bestDeal *int, itemInfos *itemData, markets []market, winningProductPrice *int, marketId int, itemName productName) {
+	if deal < *bestDeal {
+		*bestDeal = deal
+		itemInfos.MarketID = markets[marketId].ID
+		*winningProductPrice = markets[itemInfos.MarketID].Products[itemName].Price
+		itemInfos.Price = *winningProductPrice
+	}
+}
+
+func isMarketFirstBuy(fees []bool, marketID int) bool {
+	return !fees[marketID]
+}
+
+func addFees(markets []market, fees []bool) int {
+	sum := 0
+	for i := range fees {
+		if fees[i] {
+			sum += markets[i].Fee
+		}
+	}
+	return sum
 }
 
 func buildMarketList() []market {
-	market1 := parseMarketInfos("Market1.json", MARKET_1_ID)
-	market2 := parseMarketInfos("Market2.json", MARKET_2_ID)
-	market3 := parseMarketInfos("Market3.json", MARKET_3_ID)
+	market1 := parseMarketInfos("Market0.json", 0)
+	market2 := parseMarketInfos("Market1.json", 1)
+	market3 := parseMarketInfos("Market2.json", 2)
 	return []market{market1, market2, market3}
 }
 
-//TODO: considerar quantidades
-func findBestDeal(item userProducts, markets []market, fees []bool) (itemData, int) {
-	bestDeal := math.MaxInt
-	itemInfos := itemData {
-		Name: item.Name,
-	}
-	for i := 0; i < len(markets); i++ {
-		fee := 0
-		if !fees[markets[i].ID] {
-			fee = markets[i].Fee
-		}
-		deal := markets[i].Products[item.Name].Price + fee
-		if deal < bestDeal {
-			bestDeal = deal
-			itemInfos.MarketID = markets[i].ID
-		}
-	}
-	fees[itemInfos.MarketID] = true
-	return itemInfos, bestDeal
-}
 
 func parseMarketInfos(fileName string, marketID int) market {
 	var marketData marketList
@@ -119,8 +173,8 @@ func parseMarketInfos(fileName string, marketID int) market {
 	}
 }
 
-func makeMap(list []product) map[string]productData {
-	productsMap := make(map[string]productData)
+func makeMap(list []product) map[productName]productData {
+	productsMap := make(map[productName]productData)
 	for _, item := range list{
 		productsMap[item.Name] = item.Data
 	}
@@ -140,28 +194,17 @@ func parseUserListInfos(fileName string) userList {
 	return user
 }
 
-func printResults(checkout checkoutList, markets []market, fees []bool) {
-	fmt.Println(checkout)
-	fmt.Println(checkout.Price, checkPrice(checkout, markets, fees))
+func printResults(checkoutItems map[productName]itemData, totalPrice int, markets []market, fees []bool) {
+	fmt.Println(checkoutItems)
+	fmt.Println(totalPrice, "=", checkPrice(checkoutItems, markets, fees))
 }
 
-func checkPrice(checkout checkoutList, markets []market, fees []bool) int {
+func checkPrice(checkoutItems map[productName]itemData, markets []market, fees []bool) int {
 	sum := 0
-	for _, item := range checkout.Items {
-		sum += markets[item.MarketID - 1].Products[item.Name].Price
+	for _, infos := range checkoutItems {
+		sum += infos.Price
 	}
 	sum += addFees(markets, fees)
-	
-	return sum
-}
-
-func addFees(markets []market, fees []bool) int {
-	sum := 0
-	for i := range fees {
-		if fees[i] {
-			sum += markets[i - 1].Fee
-		}
-	}
 	return sum
 }
 
