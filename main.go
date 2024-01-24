@@ -45,6 +45,10 @@ type market struct {
 type marketID int
 type productName string
 
+const (
+	PRICES_DIFF = "price_diff"
+)
+
 func main() {
 	getProducts()
 }
@@ -98,6 +102,11 @@ func findBestDeal(itemName productName, markets []market, fees []bool, marketBes
 
 	if bestPrice.Price < winningProductPrice {
 		marketBestPrices[bestPrice.MarketID][itemName] = bestPrice.Price
+		marketBestPrices[bestPrice.MarketID][PRICES_DIFF] += winningProductPrice - bestPrice.Price
+		if marketBestPrices[bestPrice.MarketID][PRICES_DIFF] > markets[bestPrice.MarketID].Fee {
+			checkPreviousProducts(checkoutItems, marketBestPrices, int(bestPrice.MarketID))
+			updateFees(fees, checkoutItems)
+		}
 	}
 
 	if isMarketFirstBuy(fees, itemInfos.MarketID) {
@@ -110,10 +119,22 @@ func findBestDeal(itemName productName, markets []market, fees []bool, marketBes
 
 func checkPreviousProducts(checkoutItems map[productName]itemData, marketBestPrices []map[productName]int, marketId int) {
 	for name, price := range marketBestPrices[marketId] {
+		if name == PRICES_DIFF {
+			continue
+		}
 		checkoutItems[name] = itemData{
 			MarketID: marketId,
 			Price:    price,
 		}
+	}
+}
+
+func updateFees(fees []bool, checkoutItems map[productName]itemData) {
+	for i := range fees {
+		fees[i] = false
+	}
+	for _, item := range checkoutItems {
+		fees[item.MarketID] = true
 	}
 }
 
@@ -196,6 +217,7 @@ func parseUserListInfos(fileName string) userList {
 
 func printResults(checkoutItems map[productName]itemData, totalPrice int, markets []market, fees []bool) {
 	fmt.Println(checkoutItems)
+	fmt.Println(fees)
 	fmt.Println(totalPrice, "=", checkPrice(checkoutItems, markets, fees))
 }
 
